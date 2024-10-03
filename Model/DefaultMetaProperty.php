@@ -1,0 +1,28 @@
+<?php
+
+namespace DamConsultants\Macfarlane\Model;
+
+class DefaultMetaProperty extends \Magento\Framework\Model\AbstractModel
+{
+    protected const CACHE_TAG = 'DamConsultants_Macfarlane';
+
+    /**
+     * @var $_cacheTag
+     */
+    protected $_cacheTag = 'DamConsultants_Macfarlane';
+
+    /**
+     * @var $_eventPrefix
+     */
+    protected $_eventPrefix = 'DamConsultants_Macfarlane';
+
+    /**
+     * Meta Property
+     *
+     * @return $this
+     */
+    protected function _construct()
+    {
+        $this->_init(\DamConsultants\Macfarlane\Model\ResourceModel\DefaultMetaProperty::class);
+    }
+}
