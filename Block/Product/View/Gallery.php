@@ -165,27 +165,29 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                 $bynder_image = $product->getData('bynder_multi_img');
                 $json_value = json_decode($bynder_image, true);
 
-                $role_image = 0;
+                $flag = '';
                 foreach ($json_value as $key => $values) {
                     $image_values =  trim($values['thum_url']);
+                    $isMain = '';
                     if ($values['item_type'] == 'IMAGE') {
                         foreach ($values['image_role'] as $image_role) {
-                            if ($image_role ==  'Base') {
-                                $role_image = 1;
+                            if ($image_role == 'Base') {
+                                $flag = true;
+                                $isMain = true;
                             }
                         }
-                    }
+					}
                     $imageItem = new DataObject([
                         'thumb' => $image_values,
                         'img' => $image_values,
                         'full' => $image_values,
                         'caption' => $this->getProduct()->getName(),
                         'position' => $key + 1,
-                        'isMain' =>$role_image,
-                        'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'video',
+                        'isMain' => $isMain,
+                        'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'iframe',
                         'videoUrl' => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
                         "src" => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
-                        "type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
+                        //"type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
                     ]);
                     $imagesItems[] = $imageItem->toArray();
                 }
@@ -213,12 +215,16 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
             if (!empty($product->getData('bynder_multi_img'))) {
                 $bynder_image = $product->getData('bynder_multi_img');
                 $json_value = json_decode($bynder_image, true);
-                $role_image = 0;
+                 $flag = '';
                 foreach ($json_value as $key => $values) {
-                    $image_values =  trim($values['thum_url']);
-                    foreach ($values['image_role'] as $image_role) {
-                        if ($image_role ==  'Base') {
-                            $role_image = 1;
+                    $image_values = trim($values['thum_url']);
+                    $isMain = '';
+                    if ($values['item_type'] == 'IMAGE') {
+                        foreach ($values['image_role'] as $image_role) {
+                            if ($image_role == 'Base') {
+                                $isMain = true;
+                                $flag = true;
+                            }
                         }
                     }
                     $imageItem = new DataObject([
@@ -227,11 +233,11 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                         'full' => $image_values,
                         'caption' => $this->getProduct()->getName(),
                         'position' => $key + 1,
-                        'isMain' =>$role_image,
-                        'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'video',
+                        'isMain' => $isMain,
+                        'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'iframe',
                         'videoUrl' => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
                         "src" => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
-                        "type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
+                        //"type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
                     ]);
                     $imagesItems[] = $imageItem->toArray();
                 }

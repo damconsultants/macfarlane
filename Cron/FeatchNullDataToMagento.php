@@ -391,8 +391,13 @@ class FeatchNullDataToMagento
                         foreach ($bynder_image_role as $m_bynder_role) {
                             $lower_m_bynder_role = strtolower($m_bynder_role);
                             $original_m_bynder_role = $m_bynder_role;
-                            if (isset($data_value["thumbnails"][$original_m_bynder_role])) {
-                                $images_urls_list[]= $data_value["thumbnails"][$original_m_bynder_role]."\n";
+                            if($m_bynder_role == "Base"){
+                                $original_m_bynder_role_slug = "Base image";
+                            }else{
+                                $original_m_bynder_role_slug = $m_bynder_role;
+                            }
+                            if (isset($data_value["thumbnails"][$original_m_bynder_role_slug])) {
+                                $images_urls_list[]= $data_value["thumbnails"][$original_m_bynder_role_slug]."\n";
                                 $new_magento_role_list[] = $original_m_bynder_role."\n";
 
                                 $alt_text_vl = $data_value["thumbnails"]["img_alt_text"];
@@ -402,7 +407,7 @@ class FeatchNullDataToMagento
 
                                 $new_bynder_alt_text[] = (strlen($alt_text_vl) > 0)?$alt_text_vl."\n":"###\n";
                             } else {
-                                $images_urls_list[]= $data_value["thumbnails"]["JPG"]."\n";
+                                $images_urls_list[]= $data_value["thumbnails"]["Product"]."\n";
                                 $new_magento_role_list[] = $original_m_bynder_role."\n";
                                 $alt_text_vl = $data_value["thumbnails"]["img_alt_text"];
                                 if (is_array($data_value["thumbnails"]["img_alt_text"])) {
@@ -427,8 +432,8 @@ class FeatchNullDataToMagento
                         $new_bynder_mediaid_text[] = $bynder_media_id."\n";
                     }
                     if (count($images_urls_list) == 0) {
-                        if (isset($image_data["JPG"])) {
-                            $images_urls_list[] = $image_data["JPG"]."\n";
+                        if (isset($image_data["Product"])) {
+                            $images_urls_list[] = $image_data["Product"]."\n";
                         } else {
                            /* $logger->info("================   something problem in this sku  ================");
                              $logger->info(json_encode($data_sku[0])); */
@@ -810,15 +815,15 @@ class FeatchNullDataToMagento
                         }
                     }
                     foreach ($new_video_array as $vv => $video_value) {
-                        $item_url = explode("?", $video_value);
-                        $thum_url = explode("@@", $video_value);
+                        //$item_url = explode("?", $video_value);
+                        $item_url = explode("@@", $video_value);
                         $media_video_explode = explode("/", $item_url[0]);
                         if (!in_array($item_url[0], $old_item_url)) {
                             $video_detail[] = [
                                 "item_url" => $item_url[0],
                                 "image_role" => null,
                                 "item_type" => 'VIDEO',
-                                "thum_url" => $thum_url[1],
+                                "thum_url" => $item_url[1],
                                 "bynder_md_id" => $bynder_media_id[$vv]
                             ];
                             $data_video_data = [
@@ -872,15 +877,15 @@ class FeatchNullDataToMagento
 
                     $video_detail = [];
                     foreach ($new_video_array as $vv => $video_value) {
-                        $item_url = explode("?", $video_value);
-                        $thum_url = explode("@@", $video_value);
+                        //$item_url = explode("?", $video_value);
+                        $item_url = explode("@@", $video_value);
                         $media_video_explode = explode("/", $item_url[0]);
 
                         $video_detail[] = [
                             "item_url" => $item_url[0],
                             "image_role" => null,
                             "item_type" => 'VIDEO',
-                            "thum_url" => $thum_url[1],
+                            "thum_url" => $item_url[1],
                             "bynder_md_id" => $bynder_media_id[$vv]
                         ];
                         $data_video_data = [

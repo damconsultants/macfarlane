@@ -10,17 +10,19 @@ class Index extends \Magento\Backend\Block\Template
     /**
      * @var \DamConsultants\Macfarlane\Helper\Data
      */
-    protected $helperdata;
+    protected $_helperdata;
 
     /**
      * @var \DamConsultants\Macfarlane\Model\MetaPropertyFactory
      */
-    protected $metaProperty;
+    protected $_metaProperty;
 
     /**
      * @var \DamConsultants\Macfarlane\Model\ResourceModel\Collection\MetaPropertyCollectionFactory
      */
-    protected $metaPropertyCollectionFactory;
+    protected $_metaPropertyCollectionFactory;
+	protected $_default_metaProperty_collection;
+	protected $_storeManager;
 
     /**
      * Metaproperty
