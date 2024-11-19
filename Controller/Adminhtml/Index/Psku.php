@@ -329,12 +329,8 @@ class Psku extends \Magento\Backend\App\Action
         $data_val_arr = [];
         $result = $this->resultJsonFactory->create();
         if ($convert_array['status'] == 1) {
-            /*
-            echo "<pre>";
-            print_r($convert_array['data']);
-            exit;
-            */
             foreach ($convert_array['data'] as $data_value) {
+                $is_order = array();
                 if ($select_attribute == $data_value['type']) {
                     $bynder_media_id = $data_value['id'];
                     $image_data = $data_value['thumbnails'];
@@ -383,6 +379,12 @@ class Psku extends \Magento\Backend\App\Action
                                 $new_bynder_alt_text[] = (strlen($alt_text_vl) > 0)?$alt_text_vl."\n":"###\n";
                             }
                             $new_bynder_mediaid_text[] = $bynder_media_id."\n";
+                            $magento_order_slug = "property_" . $collection_data_slug_val['image_order']['bynder_property_slug'];
+                            if(isset($data_value[$magento_order_slug])) {
+                                foreach ($data_value[$magento_order_slug]  as $property_Magento_Media_Order) {
+                                    $is_order[] = $property_Magento_Media_Order . "\n";
+                                }
+                            }
                         }
                     } else {
                         $new_magento_role_list[] = "###"."\n";
@@ -394,6 +396,12 @@ class Psku extends \Magento\Backend\App\Action
                             $new_bynder_alt_text[] = "###\n";
                         }
                         $new_bynder_mediaid_text[] = $bynder_media_id."\n";
+                        $magento_order_slug = "property_" . $collection_data_slug_val['image_order']['bynder_property_slug'];
+						if(isset($data_value[$magento_order_slug])) {
+							foreach ($data_value[$magento_order_slug]  as $property_Magento_Media_Order) {
+								$is_order[] = $property_Magento_Media_Order . "\n";
+							}
+						}
                     }
                     if (count($images_urls_list) == 0) {
                         if (isset($image_data["Product"])) {
@@ -409,7 +417,8 @@ class Psku extends \Magento\Backend\App\Action
                             "url" => $images_urls_list, /* chagne by kuldip ladola for testing perpose */
                             'magento_image_role' => $new_magento_role_list,
                             'image_alt_text' => $new_bynder_alt_text,
-                            'bynder_media_id_new' => $new_bynder_mediaid_text
+                            'bynder_media_id_new' => $new_bynder_mediaid_text,
+                            'is_order' => $is_order
                         ];
                         
                         array_push($data_val_arr, $data_p);
@@ -417,7 +426,7 @@ class Psku extends \Magento\Backend\App\Action
                         if ($select_attribute == 'video') {
                             $video_link = $image_data["image_link"] . '@@' . $image_data["webimage"];
                             array_push($data_arr, $data_sku[0]);
-                            $data_p = ["sku" => $data_sku[0], "url" => $video_link];
+                            $data_p = ["sku" => $data_sku[0], "url" => $video_link, 'is_order' => $is_order];
                             array_push($data_val_arr, $data_p);
 
                         } else {
@@ -425,7 +434,7 @@ class Psku extends \Magento\Backend\App\Action
                             $doc_name_with_space = preg_replace("/[^a-zA-Z]+/", "-", $doc_name);
                             $doc_link = $image_data["image_link"] . '@@' . $doc_name_with_space;
                             array_push($data_arr, $data_sku[0]);
-                            $data_p = ["sku" => $data_sku[0], "url" => $doc_link];
+                            $data_p = ["sku" => $data_sku[0], "url" => $doc_link, 'is_order' => $is_order];
                             array_push($data_val_arr, $data_p);
                         }
 
@@ -434,6 +443,13 @@ class Psku extends \Magento\Backend\App\Action
             }
         }
         if (count($data_arr) > 0) {
+            /*
+            echo "<pre>";
+            print_r($data_arr);
+            echo "<br/>\n==================================================\n<br/>";
+            print_r($data_val_arr);
+            exit;
+            */
             $this->getProcessItem($data_arr, $data_val_arr);
         } else {
             $result_data = $result->setData(['status' => 0, 'message' => 'No Data Found...']);
@@ -452,12 +468,13 @@ class Psku extends \Magento\Backend\App\Action
         $result = $this->resultJsonFactory->create();
         $image_value_details_role = [];
         $temp_arr = [];
-        
+        $byn_is_order = [];
         foreach ($data_arr as $key => $skus) {
             $temp_arr[$skus][] = implode("", $data_val_arr[$key]["url"]);
             $image_value_details_role[$skus][] = implode("", $data_val_arr[$key]["magento_image_role"]);
             $image_alt_text[$skus][] = implode("", $data_val_arr[$key]["image_alt_text"]);
             $byn_md_id_new[$skus][] = implode("", $data_val_arr[$key]["bynder_media_id_new"]);
+            $byn_is_order[$skus][] = implode("", $data_val_arr[$key]["is_order"]);
         }
         
         foreach ($temp_arr as $product_sku_key => $image_value) {
@@ -466,12 +483,15 @@ class Psku extends \Magento\Backend\App\Action
             $mg_role = implode("", $image_value_details_role[$product_sku_key]);
             $image_alt_text_value = implode("", $image_alt_text[$product_sku_key]);
             $byd_media_id_value = implode("", $byn_md_id_new[$product_sku_key]);
+            $byd_media_is_order = implode("", $byn_is_order[$product_sku_key]);
+           
             $this->getUpdateImage(
                 $img_json,
                 $product_sku_key,
                 $mg_role,
                 $image_alt_text_value,
-                $byd_media_id_value
+                $byd_media_id_value,
+                $byd_media_is_order
             );
         }
     }
@@ -485,9 +505,9 @@ class Psku extends \Magento\Backend\App\Action
      * @param string $img_alt_text
      * @param string $bynder_media_ids
      */
-    public function getUpdateImage($img_json, $product_sku_key, $mg_img_role_option, $img_alt_text, $bynder_media_ids)
+    public function getUpdateImage($img_json, $product_sku_key, $mg_img_role_option, $img_alt_text, $bynder_media_ids, $byd_media_is_order)
     {
-        
+      
         $result = $this->resultJsonFactory->create();
         $select_attribute = $this->getRequest()->getParam('select_attribute');
         $image_detail = [];
@@ -508,12 +528,23 @@ class Psku extends \Magento\Backend\App\Action
             
             $doc_value = $_product->getBynderDocument();
             $bynder_media_id = explode("\n", $bynder_media_ids);
+            $isOrder = explode("\n", $byd_media_is_order);
+           /*  echo "<pre>";
+            print_r($isOrder);
+            exit; */
             if ($select_attribute == "image") {
                 if (!empty($image_value)) {
                     $new_image_array = explode("\n", $img_json);
                     $bynder_media_id = explode("\n", $bynder_media_ids);
                     $new_alttext_array = explode("\n", $img_alt_text);
                     $new_magento_role_option_array = explode("\n", $mg_img_role_option);
+/* 
+                     echo "<pre>";
+                    print_r($new_image_array);
+                    print_r($new_alttext_array);
+                    print_r($isOrder);
+                    exit;  */
+
                     $all_item_url = [];
                     $item_old_value = json_decode($image_value, true);
 					if (is_array($item_old_value)) {
@@ -538,6 +569,17 @@ class Psku extends \Magento\Backend\App\Action
                             if ($new_magento_role_option_array[$vv] != "###") {
                                 $curt_img_role = [$new_magento_role_option_array[$vv]];
                             }
+                            /* New added by me */
+                            /* if(count($isOrder) > 0){
+                                $is_order = implode("",$isOrder);
+                            }else{
+                                $is_order = 100;
+                            } */
+                            /*
+                                It's commented by kuldip ladola
+                                */
+                            $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
+                            
                             $image_detail[] = [
                                 "item_url" => $new_image_value,
                                 "alt_text" => $img_altText_val,
@@ -545,7 +587,8 @@ class Psku extends \Magento\Backend\App\Action
                                 "item_type" => 'IMAGE',
                                 "thum_url" => $item_url[0],
                                 "bynder_md_id" => $bynder_media_id[$vv],
-                                "is_import" => 0
+                                "is_import" => 0,
+                                "is_order" => $is_order
                             ];
 							$total_new_value = count($image_detail);
                             if ($total_new_value > 1) {
@@ -561,6 +604,11 @@ class Psku extends \Magento\Backend\App\Action
                                 }
                             }
                             if (!in_array($item_url[0], $all_item_url)) {
+                                /*
+                                    It's commented by kuldip ladola
+                                     */
+                                $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
+                               
                                 $diff_image_detail[] = [
                                     "item_url" => $new_image_value,
                                     "alt_text" => $img_altText_val,
@@ -568,7 +616,8 @@ class Psku extends \Magento\Backend\App\Action
                                     "item_type" => 'IMAGE',
                                     "thum_url" => $item_url[0],
                                     "bynder_md_id" => $bynder_media_id[$vv],
-                                    "is_import" => 0
+                                    "is_import" => 0,
+                                    "is_order" => $is_order
                                 ];
 								if (is_array($item_old_value)) {
 									if (count($item_old_value) > 0) {
@@ -632,7 +681,8 @@ class Psku extends \Magento\Backend\App\Action
 										"item_type" => $img['item_type'],
 										"thum_url" => $img['thum_url'],
 										"bynder_md_id" => $img['bynder_md_id'],
-										"is_import" => $img['is_import']
+										"is_import" => $img['is_import'],
+                                        "is_order" => $img['is_order'],
 									];
 								}
 							}
@@ -700,7 +750,7 @@ class Psku extends \Magento\Backend\App\Action
                             if ($new_magento_role_option_array[$vv] != "###") {
                                 $curt_img_role = [$new_magento_role_option_array[$vv]];
                             }
-                            
+                            $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
                             $image_detail[] = [
                                 "item_url" => $image_value,
                                 "alt_text" => $img_altText_val,
@@ -708,7 +758,8 @@ class Psku extends \Magento\Backend\App\Action
                                 "item_type" => 'IMAGE',
                                 "thum_url" => $item_url[0],
                                 "bynder_md_id" => $bynder_media_id[$vv],
-                                "is_import" => 0
+                                "is_import" => 0,
+                                "is_order" => $is_order
                             ];
                             $total_new_value = count($image_detail);
                             if ($total_new_value > 1) {
@@ -785,12 +836,14 @@ class Psku extends \Magento\Backend\App\Action
                         $thum_url = explode("@@", $video_value);
                         $media_video_explode = explode("/", $item_url[0]);
                         if (!in_array($item_url[0], $old_item_url)) {
+                            $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
                             $video_detail[] = [
                                 "item_url" => $item_url[0],
                                 "image_role" => null,
                                 "item_type" => 'VIDEO',
                                 "thum_url" => $thum_url[1],
-                                "bynder_md_id" => $bynder_media_id[$vv]
+                                "bynder_md_id" => $bynder_media_id[$vv],
+                                "is_order" => $is_order
                             ];
                         }
                     }
@@ -837,17 +890,18 @@ class Psku extends \Magento\Backend\App\Action
                     $new_video_array = explode(" \n", $img_json);
                    
                     $video_detail = [];
-                    foreach ($new_video_array as $video_value) {
+                    foreach ($new_video_array as $vv => $video_value) {
                         $item_url = explode("?", $video_value);
                         $thum_url = explode("@@", $video_value);
                         $media_video_explode = explode("/", $item_url[0]);
-
+                        $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
                         $video_detail[] = [
                             "item_url" => $item_url[0],
                             "image_role" => null,
                             "item_type" => 'VIDEO',
                             "thum_url" => $thum_url[1],
-                            "bynder_md_id" => $bynder_media_id
+                            "bynder_md_id" => $bynder_media_id,
+                            "is_order" => $is_order
                         ];
                     }
                     foreach ($video_detail as $img) {
@@ -893,10 +947,12 @@ class Psku extends \Magento\Backend\App\Action
                     foreach ($new_doc_array as $vv => $doc_value) {
                         $item_url = explode("?", $doc_value);
                         $media_doc_explode = explode("/", $item_url[0]);
+                        $is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
                         $doc_detail[] = [
                             "item_url" => $item_url[0],
                             "item_type" => 'DOCUMENT',
-                            "bynder_md_id" => $bynder_media_id[$vv]
+                            "bynder_md_id" => $bynder_media_id[$vv],
+                            "is_order" => $is_order
                         ];
                     }
                     $new_value_array = json_encode($doc_detail, true);

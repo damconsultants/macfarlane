@@ -155,6 +155,7 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
 
     public function getGalleryImagesJson()
     {
+       
         $product = $this->_registry->registry('product');
         $imagesItems = [];
         $use_bynder_cdn = $product->getData('use_bynder_cdn');
@@ -164,25 +165,37 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
             if (!empty($product->getData('bynder_multi_img'))) {
                 $bynder_image = $product->getData('bynder_multi_img');
                 $json_value = json_decode($bynder_image, true);
-
+                usort($json_value, function ($a, $b) {
+                    return $a['is_order'] <=> $b['is_order'];
+                });
                 $flag = '';
+                $all_unq_media_ids = array();
                 foreach ($json_value as $key => $values) {
-                    $image_values =  trim($values['thum_url']);
+                    // check image already added or not
+                    if(in_array($values["bynder_md_id"],$all_unq_media_ids)){
+                        continue;
+                    }else{
+                        array_push($all_unq_media_ids,$values["bynder_md_id"]);
+                    }
+                    $image_values = trim($values['thum_url']);
                     $isMain = '';
                     if ($values['item_type'] == 'IMAGE') {
-                        foreach ($values['image_role'] as $image_role) {
-                            if ($image_role == 'Base') {
-                                $flag = true;
-                                $isMain = true;
+                        if(count($values['image_role']) > 0){
+                            foreach ($values['image_role'] as $image_role) {
+                                if ($image_role == 'Base') {
+                                    $isMain = true;
+                                    $flag = true;
+                                }
                             }
                         }
-					}
+                    }
+                    $position = isset($values['is_order']) ? (int)$values['is_order'] : $key + 1;
                     $imageItem = new DataObject([
                         'thumb' => $image_values,
                         'img' => $image_values,
                         'full' => $image_values,
                         'caption' => $this->getProduct()->getName(),
-                        'position' => $key + 1,
+                        'position' => $position,
                         'isMain' => $isMain,
                         'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'iframe',
                         'videoUrl' => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
@@ -190,6 +203,7 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                         //"type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
                     ]);
                     $imagesItems[] = $imageItem->toArray();
+                   
                 }
             }
             foreach ($this->getGalleryImages() as $image) {
@@ -197,7 +211,7 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                     'thumb' => $image->getData('small_image_url'),
                     'img' => $image->getData('medium_image_url'),
                     'full' => $image->getData('large_image_url'),
-                    'caption' => ($role_image == 1) ? 0 :($image->getLabel() ?: $this->getProduct()->getName()),
+                    'caption' => ($image->getLabel() ?: $this->getProduct()->getName()),
                     'position' => $image->getData('position'),
                     'isMain' => $this->isMainImage($image),
                     'type' => str_replace('external-', '', $image->getMediaType()),
@@ -215,8 +229,18 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
             if (!empty($product->getData('bynder_multi_img'))) {
                 $bynder_image = $product->getData('bynder_multi_img');
                 $json_value = json_decode($bynder_image, true);
-                 $flag = '';
+                usort($json_value, function ($a, $b) {
+                    return $a['is_order'] <=> $b['is_order'];
+                });
+                $flag = '';
+                $all_unq_media_ids = array();
                 foreach ($json_value as $key => $values) {
+                     // check image already added or not
+                     if(in_array($values["bynder_md_id"],$all_unq_media_ids)){
+                        continue;
+                    }else{
+                        array_push($all_unq_media_ids,$values["bynder_md_id"]);
+                    }
                     $image_values = trim($values['thum_url']);
                     $isMain = '';
                     if ($values['item_type'] == 'IMAGE') {
@@ -227,12 +251,13 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                             }
                         }
                     }
+                    $position = isset($values['is_order'][0]) ? (int)$values['is_order'][0] : $key + 1;
                     $imageItem = new DataObject([
                         'thumb' => $image_values,
                         'img' => $image_values,
                         'full' => $image_values,
                         'caption' => $this->getProduct()->getName(),
-                        'position' => $key + 1,
+                        'position' => $position,
                         'isMain' => $isMain,
                         'type' => ($values['item_type'] == 'IMAGE') ? 'image' : 'iframe',
                         'videoUrl' => ($values['item_type'] == 'VIDEO') ? $values['item_url'] : null,
@@ -240,6 +265,7 @@ class Gallery extends \Magento\Catalog\Block\Product\View\Gallery
                         //"type" => ($values['item_type'] == 'VIDEO') ? 'iframe' : null
                     ]);
                     $imagesItems[] = $imageItem->toArray();
+                   
                 }
             } else {
                 /* CDN link empty */
