@@ -1,10 +1,10 @@
 <?php
 $block_get_data = $block->getMetaData();
 $get_metaData = $block_get_data['metadata'];
-$default_sku_value = $block_get_data['sku_selected'];
-$default_image_role_value = $block_get_data['image_role_selected'];
-$default_image_alt_text = $block_get_data['image_alt_text'];
-$default_image_media_order = $block_get_data['image_order'];
+$default_sku_value = isset($block_get_data['sku_selected']) ? $block_get_data['sku_selected'] : '0';
+$default_image_role_value = isset($block_get_data['image_role_selected']) ? $block_get_data['image_role_selected'] : '0';
+$default_image_alt_text = isset($block_get_data['image_alt_text']) ? $block_get_data['image_alt_text'] : '0';
+$default_image_media_order = isset($block_get_data['image_order']) ? $block_get_data['image_order'] : '0';
 $url = $block->getMainUrl();
 $syncMetaUrl = $url . "bynder/index/synmetaproperty";
 

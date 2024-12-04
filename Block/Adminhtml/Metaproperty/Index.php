@@ -106,10 +106,18 @@ class Index extends \Magento\Backend\Block\Template
                 ];
             }
 
-            $response_data['sku_selected'] = $properties_details["sku"]["bynder_property_slug"];
-            $response_data['image_role_selected']= $properties_details["image_role"]["bynder_property_slug"];
-            $response_data['image_alt_text']= $properties_details["alt_text"]["bynder_property_slug"];
-            $response_data['image_order']= $properties_details["image_order"]["bynder_property_slug"];
+            $response_data['sku_selected'] = isset($properties_details["sku"]["bynder_property_slug"])
+            ? $properties_details["sku"]["bynder_property_slug"]
+            : '0';
+            $response_data['image_role_selected']= isset($properties_details["image_role"]["bynder_property_slug"])
+            ? $properties_details["image_role"]["bynder_property_slug"] 
+            : '0';
+            $response_data['image_alt_text']= isset($properties_details["alt_text"]["bynder_property_slug"])
+            ? $properties_details["alt_text"]["bynder_property_slug"]
+            : '0';
+            $response_data['image_order']= isset($properties_details["image_order"]["bynder_property_slug"])
+            ? $properties_details["image_order"]["bynder_property_slug"] 
+            : '0';
         } else {
             $response_data['sku_selected'] = '0';
             $response_data['image_role_selected'] = '0';
