@@ -5,6 +5,7 @@ $default_sku_value = isset($block_get_data['sku_selected']) ? $block_get_data['s
 $default_image_role_value = isset($block_get_data['image_role_selected']) ? $block_get_data['image_role_selected'] : '0';
 $default_image_alt_text = isset($block_get_data['image_alt_text']) ? $block_get_data['image_alt_text'] : '0';
 $default_image_media_order = isset($block_get_data['image_order']) ? $block_get_data['image_order'] : '0';
+$default_manage_assets = isset($block_get_data['manage_assets']) ? $block_get_data['manage_assets'] : '0';
 $url = $block->getMainUrl();
 $syncMetaUrl = $url . "bynder/index/synmetaproperty";
 
@@ -12,12 +13,14 @@ $sku_properites = "";
 $image_role_properites = "";
 $alt_properites = "";
 $is_order = "";
+$manage_assets_use = "";
 if (count($get_metaData) > 0) {
     foreach ($get_metaData as $newKey => $newValue) {
         $sku_checked = "";
         $image_role_checked = "";
         $alt_checked = "";
         $media_order_checked = "";
+		$manage_assets_use_checked = "";
         if ($default_sku_value == $newKey) {
             $sku_checked = "selected";
         } elseif ($default_image_role_value == $newKey) {
@@ -26,6 +29,8 @@ if (count($get_metaData) > 0) {
             $alt_checked = "selected";
         } elseif ($default_image_media_order == $newKey) {
             $media_order_checked = "selected";
+        } elseif ($default_manage_assets == $newKey) {
+            $manage_assets_use_checked = "selected";
         }
         $sku_properites .= '<option value="' . $newKey . '" ' . $sku_checked . ' >' .
             $block->escapeHtml($newValue) .
@@ -37,6 +42,9 @@ if (count($get_metaData) > 0) {
             $newValue .
             '</option>';
         $is_order .= '<option value="' . $newKey . '" ' . $media_order_checked . ' >' .
+            $newValue .
+            '</option>';
+		$manage_assets_use .= '<option value="' . $newKey . '" ' . $manage_assets_use_checked . ' >' .
             $newValue .
             '</option>';
     }
@@ -92,6 +100,18 @@ if (count($get_metaData) > 0) {
                         <select class="selectbox_item" id="bynder_property_alt_tax" name="select_meta_tag[]">
                             <option value="0">Select The option</option>
                             <?= $alt_properites; ?>
+                        </select>
+                    </label>
+                </div>
+				 <hr>
+                <label> <strong> The Meta Property Configration For Manage assets:-</strong> </label> <br><br>
+                <div class="form-check form-check-inline" style="float: left;width: 100%;">
+                    <label class="form-check-label">
+                        <label> <strong>Property List:-</strong> </label> <br><br>
+                        <input type="hidden" name="system_slug[]" value="manage_assets" />
+                        <select class="selectbox_item" id="bynder_property_manage_assets" name="select_meta_tag[]">
+                            <option value="0">Select The option</option>
+                            <?= $manage_assets_use; ?>
                         </select>
                     </label>
                 </div>

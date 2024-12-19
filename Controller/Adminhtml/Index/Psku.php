@@ -716,7 +716,8 @@ class Psku extends \Magento\Backend\App\Action
                     $this->getInsertDataTable($data_image_data);
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
-                        'bynder_isMain' => $flag
+                        'bynder_isMain' => $flag,
+                        'use_bynder_cdn' => 1
                     ];
                     $this->productAction->updateAttributes(
                         [$product_ids],
@@ -805,7 +806,8 @@ class Psku extends \Magento\Backend\App\Action
                     
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
-                        'bynder_isMain' => $flag
+                        'bynder_isMain' => $flag,
+                        'use_bynder_cdn' => 1
                     ];
                     $this->productAction->updateAttributes(
                         [$product_ids],
@@ -872,7 +874,8 @@ class Psku extends \Magento\Backend\App\Action
                     $this->getInsertDataTable($data_video_data);
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
-                        'bynder_isMain' => $flag
+                        'bynder_isMain' => $flag,
+                        'use_bynder_cdn' => 1
                     ];
                     $this->productAction->updateAttributes(
                         [$product_ids],
@@ -925,7 +928,8 @@ class Psku extends \Magento\Backend\App\Action
                     $this->getInsertDataTable($data_video_data);
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
-                        'bynder_isMain' => $flag
+                        'bynder_isMain' => $flag,
+                        'use_bynder_cdn' => 1
                     ];
                     $this->productAction->updateAttributes(
                         [$product_ids],
@@ -967,7 +971,59 @@ class Psku extends \Magento\Backend\App\Action
                         ['bynder_document' => $new_value_array],
                         $storeId
                     );
-                }
+                } else {
+					$b_id = [];
+					$all_item_url = [];
+					$item_old_value = json_decode($doc_value, true);
+                    if (is_array($item_old_value)) {
+						if (count($item_old_value) > 0) {
+							foreach ($item_old_value as $doc) {
+                                if ($doc['item_type'] == 'DOCUMENT') {
+                                    $all_item_url[] = $doc['item_url'];
+                                    $b_id[] = $doc['bynder_md_id'];
+                                }
+                            }
+						}
+                    }
+                    $new_doc_array = explode("\n", $img_json);
+                    $doc_detail = [];
+                    foreach ($new_doc_array as $vv => $doc_value) {
+                        if(!empty($doc_value)){
+							$is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
+                            $media_doc_explode = explode("/", $item_url[0]);
+                            if(!in_array($bynder_media_id[$vv], $b_id)) {
+								$item_url = explode("?", $doc_value);
+								$media_doc_explode = explode("/", $item_url[0]);
+								$is_order = isset($isOrder[$vv]) ? $isOrder[$vv] : "";
+								$doc_detail[] = [
+									"item_url" => $item_url[0],
+									"item_type" => 'DOCUMENT',
+									"bynder_md_id" => $bynder_media_id[$vv],
+									"is_order" => $is_order
+								];
+                            }
+                        }
+                    }
+					$new_value_array = json_encode($doc_detail, true);
+                    $array_merg = array_merge($item_old_value, $doc_detail);
+					$doc_value = [];
+					foreach ($array_merg as $doc) {
+                        $doc_value[] = $doc['item_url'];
+                    }
+					$doc_value_array = implode(',', $doc_value);
+					$data_doc_value = [
+                        'sku' => $product_sku_key,
+                        'message' => $doc_value_array,
+                        'data_type' => '2',
+                        "lable" => "1"
+                    ];
+                    $this->getInsertDataTable($data_doc_value);
+                    $this->productAction->updateAttributes(
+                        [$product_ids],
+                        ['bynder_document' => $new_value_array],
+                        $storeId
+                    );
+				}
             }
         } catch (\Exception $e) {
             return $result->setData(['message' => $e->getMessage()]);
