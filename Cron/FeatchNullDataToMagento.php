@@ -719,7 +719,8 @@ class FeatchNullDataToMagento
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
                         'bynder_isMain' => $flag,
-                        'bynder_cron_sync' => 1
+                        'bynder_cron_sync' => 1,
+						'use_bynder_cdn' => 1
                     ];
 
                     $this->action->updateAttributes(
@@ -808,7 +809,8 @@ class FeatchNullDataToMagento
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
                         'bynder_isMain' => $flag,
-                        'bynder_cron_sync' => 1
+                        'bynder_cron_sync' => 1,
+						'use_bynder_cdn' => 1
                     ];
 
                     $this->action->updateAttributes(
@@ -881,7 +883,8 @@ class FeatchNullDataToMagento
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
                         'bynder_isMain' => $flag,
-                        'bynder_cron_sync' => 1
+                        'bynder_cron_sync' => 1,
+						'use_bynder_cdn' => 1
                     ];
                     $this->action->updateAttributes(
                         [$product_ids],
@@ -940,7 +943,8 @@ class FeatchNullDataToMagento
                     $updated_values = [
                         'bynder_multi_img' => $new_value_array,
                         'bynder_isMain' => $flag,
-                        'bynder_cron_sync' => 1
+                        'bynder_cron_sync' => 1,
+						'use_bynder_cdn' => 1
                     ];
                     $this->action->updateAttributes(
                         [$product_ids],

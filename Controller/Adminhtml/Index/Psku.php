@@ -547,10 +547,14 @@ class Psku extends \Magento\Backend\App\Action
 
                     $all_item_url = [];
                     $item_old_value = json_decode($image_value, true);
+					$old_video_value = [];
 					if (is_array($item_old_value)) {
 						if (count($item_old_value) > 0) {
 							foreach ($item_old_value as $img) {
 								$all_item_url[] = $img['thum_url'];
+								if($img['item_type'] == "VIDEO"){
+									$old_video_value[] = $img;
+								}
 							}
 						}
                     }
@@ -662,7 +666,7 @@ class Psku extends \Magento\Backend\App\Action
                         $this->getInsertMedaiDataTable($product_sku_key, $d_media_id, $product_ids, $storeId);
                     }
                     $new_image_detail = [];
-                    if (count($image_detail) > 0) {
+                    /*if (count($image_detail) > 0) {
                         foreach ($image_detail as $key => $img) {
                             $image[] = $img['item_url'];
                         }
@@ -687,13 +691,15 @@ class Psku extends \Magento\Backend\App\Action
 								}
 							}
 						}
-                    }
-                    $array_merge = array_merge($new_image_detail, $diff_image_detail);
+                    }*/
+                    $array_merge = array_merge($old_video_value, $image_detail);
                     $media_id = [];
                     foreach ($array_merge as $img) {
                         $type[] = $img['item_type'];
-                        $image[] = $img['item_url'];
-                        $media_id[] = $img['bynder_md_id'];
+						if($img['item_type'] == 'IMAGE') {
+							$image[] = $img['item_url'];
+							$media_id[] = $img['bynder_md_id'];
+						}
                         $this->getDeleteMedaiDataTable($product_sku_key, $img['bynder_md_id']);
                     }
                     $this->getInsertMedaiDataTable($product_sku_key, $media_id, $product_ids, $storeId);
@@ -706,7 +712,7 @@ class Psku extends \Magento\Backend\App\Action
                     } elseif (in_array("VIDEO", $type)) {
                         $flag = 3;
                     }
-                    $new_value_array = json_encode($array_merge, true);
+                    $new_value_array = json_encode($image_detail, true);
                     $data_image_data = [
                         'sku' => $product_sku_key,
                         'message' => $image_value_array,
