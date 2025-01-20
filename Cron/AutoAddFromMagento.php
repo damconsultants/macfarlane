@@ -616,7 +616,7 @@ class AutoAddFromMagento
                                 "image_role" => $curt_img_role,
                                 "item_type" => 'IMAGE',
                                 "thum_url" => $item_url[0],
-                                "bynder_md_id" => $bynder_media_ids[$vv],
+                                "bynder_md_id" => $bynder_media_id[$vv],
                                 "is_import" => 0,
                                 "is_order" => $is_order
                             ];

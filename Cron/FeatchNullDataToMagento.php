@@ -407,7 +407,11 @@ class FeatchNullDataToMagento
 
                                 $new_bynder_alt_text[] = (strlen($alt_text_vl) > 0)?$alt_text_vl."\n":"###\n";
                             } else {
-                                $images_urls_list[]= $data_value["thumbnails"]["Product"]."\n";
+								if (isset($image_data["Product"])) {
+									$images_urls_list[]= $data_value["thumbnails"]["Product"]."\n";
+								} else {
+									$images_urls_list[]= $data_value["thumbnails"]["webimage"]."\n";
+								}
                                 $new_magento_role_list[] = $original_m_bynder_role."\n";
                                 $alt_text_vl = $data_value["thumbnails"]["img_alt_text"];
                                 if (is_array($data_value["thumbnails"]["img_alt_text"])) {
