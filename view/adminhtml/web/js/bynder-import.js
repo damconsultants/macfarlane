@@ -255,8 +255,9 @@ require([
                   },
                 ],
               };
-              var popup = modal(options, $("#popup-modal"));
-              $("#popup-modal").modal("openModal");
+              var popupModal = $("#popup-modal");
+			  modal(options, popupModal);
+              popupModal.modal("openModal");
               return true;
             } else {
             }
