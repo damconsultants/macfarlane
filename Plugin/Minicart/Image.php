@@ -43,23 +43,26 @@ class Image
         $productId = $item->getProduct()->getId();
         $product = $this->product->load($productId);
         $bynderImage = $product->getData('bynder_multi_img');
-        $json_value = json_decode($bynderImage, true);
-        $thumbnail = 'Thumbnail';
-        if (!empty($json_value)) {
-            foreach ($json_value as $values) {
-                if (isset($values['image_role'])) {
-                    foreach ($values['image_role'] as $image_role) {
-                        if ($image_role ==  $thumbnail) {
-                            $image_values = trim($values['thum_url']);
-                            $data['product_image']['src'] =  $image_values;
-                        }
-                    }
-                }
-            }
-        } else {
-          
-            $data['product_image']['src'];
-        }
+		if (!empty($bynderImage)) {
+			$json_value = json_decode($bynderImage, true);
+			$thumbnail = 'Thumbnail';
+			if (!empty($json_value)) {
+				foreach ($json_value as $values) {
+					if (isset($values['image_role'])) {
+						foreach ($values['image_role'] as $image_role) {
+							if ($image_role ==  $thumbnail) {
+								$image_values = trim($values['thum_url']);
+								$data['product_image']['src'] =  $image_values;
+							}
+						}
+					}
+				}
+			} else {
+				$data['product_image']['src'];
+			}
+		} else {
+			$data['product_image']['src'];
+		}
         return $data;
     }
 }

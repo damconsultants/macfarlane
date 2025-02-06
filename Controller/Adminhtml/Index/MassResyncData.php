@@ -84,14 +84,12 @@ class MassResyncData extends Action
                 $products = $this->_productRepository->getList($searchCriteria);
                 $items = $products->getItems();
                 if (count($items) != 0) {
-                    if ($model->getLable() == 0) {
-                        $_product = $this->_productRepository->get($model->getSku());
-                        $product_ids[] = $_product->getId();
-                        $model = $this->bynderFactory->create()->load($model->getId());
-                        $model->setLable('2');
-                        $model->save();
-                        $count++;
-                    }
+					$_product = $this->_productRepository->get($model->getSku());
+					$product_ids[] = $_product->getId();
+					$model = $this->bynderFactory->create()->load($model->getId());
+					$model->setLable('2');
+					$model->save();
+					$count++;
                 } else {
                     if ($not_exist_skus == "") {
                         $not_exist_skus = $model->getSku();
