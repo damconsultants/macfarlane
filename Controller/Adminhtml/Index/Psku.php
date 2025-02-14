@@ -102,7 +102,6 @@ class Psku extends \Magento\Backend\App\Action
             $this->_forward('noroute');
             return '';
         }
-
         $property_id = null;
         $product_sku = $this->getRequest()->getParam('product_sku');
         $select_attribute = $this->getRequest()->getParam('select_attribute');
@@ -119,7 +118,8 @@ class Psku extends \Magento\Backend\App\Action
             if (count($productSku) > 0) {
                 foreach ($productSku as $sku) {
                     if ($sku != "") {
-                        $bd_sku = trim(preg_replace('/[^A-Za-z0-9]/', '_', $sku));
+                        /*$bd_sku = trim(preg_replace('/[^A-Za-z0-9]/', '_', $sku));*/
+                        $bd_sku = $this->datahelper->replacetoSpecialString($sku);
                         $get_data = $this->datahelper->getImageSyncWithProperties(
                             $bd_sku,
                             $property_id,
