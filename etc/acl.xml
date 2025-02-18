@@ -17,15 +17,29 @@
                     <resource id="DamConsultants_Macfarlane::menu_item1" title="Macfarlane Meta Property" sortOrder="192005" />
                 </resource>
 				<resource id="DamConsultants_Macfarlane::menu_item6" title="Macfarlane Cron Log">
-                    <resource id="DamConsultants_Macfarlane::menu_item" title="Macfarlane Cron Action Log" sortOrder="192006" />
-					<resource id="DamConsultants_Macfarlane::menu_item3" title="Macfarlane Replace Cron Action Log" sortOrder="192007" />
-					<resource id="DamConsultants_Macfarlane::menu_item4" title="Macfarlane Delete Cron Action Log" sortOrder="192008" />
+                    <resource id="DamConsultants_Macfarlane::menu_item" title="Macfarlane Cron Action Log" sortOrder="192006">
+						<resource id="DamConsultants_Macfarlane::resync" title="Macfarlane ReSync Link" sortOrder="192007"/>
+						<resource id="DamConsultants_Macfarlane::cron_delete" title="Macfarlane Delete Link" sortOrder="192007"/>
+						<resource id="DamConsultants_Macfarlane::mass_resync" title="Macfarlane Mass Re-Sync Data" sortOrder="192007"/>
+						<resource id="DamConsultants_Macfarlane::cron_massdelete" title="Macfarlane Mass Delete Data" sortOrder="192007"/>
+					</resource>
+					<resource id="DamConsultants_Macfarlane::menu_item3" title="Macfarlane Replace Cron Action Log" sortOrder="192009">
+						<resource id="DamConsultants_Macfarlane::autocron_delete" title="Macfarlane Replace Cron Delete Link" sortOrder="192009"/>
+						<resource id="DamConsultants_Macfarlane::autocron_massdelete" title="Macfarlane Replace Cron Mass Delete Link" sortOrder="192009"/>
+					</resource>
+					<resource id="DamConsultants_Macfarlane::menu_item4" title="Macfarlane Delete Cron Action Log" sortOrder="192010">
+						<resource id="DamConsultants_Macfarlane::deletecron_delete" title="Macfarlane Delete Cron Delete Link" sortOrder="192010"/>
+						<resource id="DamConsultants_Macfarlane::cron_mass_delete" title="Macfarlane Delete Cron Mass Delete Link" sortOrder="192010"/>
+					</resource>
                 </resource>
 				<resource id="DamConsultants_Macfarlane::menu_item7" title="Macfarlane Manual sync Log">
-                    <resource id="DamConsultants_Macfarlane::menu_item2" title="Macfarlane Synchronization Log" sortOrder="192009" />
+                    <resource id="DamConsultants_Macfarlane::menu_item2" title="Macfarlane Synchronization Log" sortOrder="192011">
+						<resource id="DamConsultants_Macfarlane::sync_delete" title="Macfarlane Manual Sync Delete Link" sortOrder="192011"/>
+						<resource id="DamConsultants_Macfarlane::massdelete" title="Macfarlane Manual Sync Mass Delete Link" sortOrder="192011"/>
+					</resource>
                 </resource>
 				<resource id="DamConsultants_Macfarlane::menu_item8" title="Macfarlane Configuration Settings">
-                    <resource id="DamConsultants_Macfarlane::settings" title="Macfarlane Configuration Settings" sortOrder="192010" />
+                    <resource id="DamConsultants_Macfarlane::settings" title="Macfarlane Configuration Settings" sortOrder="192012" />
                 </resource>
             </resource>
         </resource>

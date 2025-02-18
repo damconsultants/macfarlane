@@ -6,6 +6,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Ui\Component\MassAction\Filter;
 use DamConsultants\Macfarlane\Model\ResourceModel\Collection\BynderSycDataCollectionFactory;
+use Magento\Framework\AuthorizationInterface;
 
 class MassResyncData extends Action
 {
@@ -37,6 +38,7 @@ class MassResyncData extends Action
      * @var $storeManagerInterface
      */
     protected $storeManagerInterface;
+	protected $_authorization;
     /**
      * Closed constructor.
      *
@@ -56,6 +58,7 @@ class MassResyncData extends Action
         \DamConsultants\Macfarlane\Model\BynderSycDataFactory $bynderFactory,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Catalog\Model\Product\Action $action,
+		AuthorizationInterface $authorization,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface
     ) {
@@ -64,9 +67,18 @@ class MassResyncData extends Action
         $this->bynderFactory = $bynderFactory;
         $this->_productRepository = $productRepository;
         $this->action = $action;
+		$this->_authorization = $authorization;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->storeManagerInterface = $storeManagerInterface;
         parent::__construct($context);
+    }
+	/**
+     * Is Allowed
+     */
+    public function _isAllowed()
+    {
+        $allowed = $this->_authorization->isAllowed('DamConsultants_Macfarlane::mass_resync');
+		return $allowed;
     }
     /**
      * Execute
@@ -116,12 +128,5 @@ class MassResyncData extends Action
             $this->messageManager->addError(__($e->getMessage()));
         }
         return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('bynder/index/grid');
-    }
-    /**
-     * Is Allowed
-     */
-    public function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('DamConsultants_BynderDAM::resync');
     }
 }
