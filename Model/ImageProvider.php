@@ -91,43 +91,40 @@ class ImageProvider extends CoreImageProvider
      *
      * @return array
      */
-    private function getProductImageData($cartItem)
+   private function getProductImageData($cartItem)
     {
         $imageHelper = $this->imageHelper->init(
             $this->itemResolver->getFinalProduct($cartItem),
             'mini_cart_product_thumbnail'
         );
+
+        // Always define a default first (prevents undefined variable)
+        $image_values = $imageHelper->getUrl();
+
         $productId = $cartItem->getProduct()->getId();
         $product = $this->productRepositoryInterface->getById($productId);
         $bynderImage = $product->getBynderMultiImg();
+
         if (!empty($bynderImage)) {
             $json_value = json_decode($bynderImage, true);
-            $thumbnail = 'Thumbnail';
 
             if (!empty($json_value)) {
                 foreach ($json_value as $values) {
-                    if (isset($values['image_role'])) {
-                        foreach ($values['image_role'] as $image_role) {
-                            if ($image_role == $thumbnail) {
-                                $image_values = trim($values['thum_url']);
-                            } else {
-                                $image_values = $imageHelper->getUrl();
-                            }
+                    if (!empty($values['image_role']) && in_array('Thumbnail', $values['image_role'])) {
+                        if (!empty($values['thum_url'])) {
+                            $image_values = trim($values['thum_url']);
+                            break; // stop once thumbnail found
                         }
                     }
                 }
-            } else {
-                $image_values = $imageHelper->getUrl();
             }
-        } else {
-            $image_values = $imageHelper->getUrl();
         }
-        $imageData = [
+
+        return [
             'src' => $image_values,
             'alt' => $imageHelper->getLabel(),
             'width' => $imageHelper->getWidth(),
             'height' => $imageHelper->getHeight(),
         ];
-        return $imageData;
     }
 }

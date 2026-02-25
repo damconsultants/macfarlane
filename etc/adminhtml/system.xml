@@ -10,6 +10,10 @@
             <resource>DamConsultants_Macfarlane::config</resource>
             <group id="bynder_credential" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Macfarlane Credential</label>
+                <field id="version_check" translate="label" type="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label></label>
+                    <frontend_model>DamConsultants\Macfarlane\Block\Adminhtml\System\Config\VersionCheck</frontend_model>
+                </field>
                 <field id="bynderdomain" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Macfarlane Domain</label>
                     <comment>Enter your Macfarlane Domain Name Here Without https://.</comment>
@@ -24,10 +28,6 @@
                 </field>
                 <field id="bt_id" translate="label" type="button" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>DamConsultants\Macfarlane\Block\System\Config\Button</frontend_model>
-                </field>
-				<field id="module_version" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Module Version</label>
-                    <frontend_model>DamConsultants\Macfarlane\Block\Adminhtml\System\Config\Version</frontend_model>
                 </field>
             </group>
         </section>
