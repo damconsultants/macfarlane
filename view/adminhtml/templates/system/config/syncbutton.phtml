@@ -25,7 +25,6 @@
                     var resultText = '';
                     if (transport.responseJSON.status == 1) {
                         resultText = transport.statusText;
-                        console.log(transport);
                         $('#byndersyncdata_bynder_sync_data_sku').text('');
                         $(".success-msg-sync").show();
                         $(".error-msg-sync").hide();
@@ -34,7 +33,6 @@
                             $('.success-msg-sync').delay(5000).fadeOut('slow');
                         }, 5000);
                     } else {
-                        console.log(transport.responseJSON.message);
                         resultText = transport.responseJSON.message
                         $('#byndersyncdata_bynder_sync_data_sku').text('');
                         $(".error-msg-sync").show();

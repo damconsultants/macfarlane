@@ -7,6 +7,9 @@
 		<job instance="DamConsultants\Macfarlane\Cron\AutoAddFromMagento" method="execute" name="damConsultants_bynder_auto_sku_add_magento">
 			<config_path>crontab/default/jobs/damConsultants_bynder_auto_sku_add_magento/schedule/cron_expr</config_path>
 		</job>
+		<job instance="DamConsultants\Macfarlane\Cron\UpdateAllSku" method="execute" name="damConsultants_bynder_update_all_sku">
+			<config_path>crontab/default/jobs/damConsultants_bynder_update_all_sku/schedule/cron_expr</config_path>
+		</job>
 		<job instance="DamConsultants\Macfarlane\Cron\DeleteValue" method="execute" name="damConsultants_bynder_delete_cron">
 			<config_path>crontab/default/jobs/damConsultants_bynder_delete_cron/schedule/cron_expr</config_path>
 		</job>

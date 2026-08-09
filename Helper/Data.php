@@ -74,6 +74,7 @@ class Data extends AbstractHelper
     public const AUTO_CRON = 'cronimageconfig/auto_add_bynder/auto_enable';
     public const API_CALLED = 'https://developer.thedamconsultants.com/';
     public const DELETE_CRON = 'cronimageconfig/delete_cron_bynder/delete_enable';
+    public const UPDATE_ALL_SKU_CRON = 'cronimageconfig/update_all_sku/update_enable';
 
     /**
      * Data Helper
@@ -248,6 +249,15 @@ class Data extends AbstractHelper
      *
      * @return $this
      */
+    /**
+     * Get UpdateAllSku cron enable
+     *
+     * @return $this
+     */
+    public function getUpdateAllSkuCronEnable()
+    {
+        return $this->getConfig(self::UPDATE_ALL_SKU_CRON);
+    }
     public function getPermanenToken()
     {
         return (string) $this->getConfig(self::PERMANENT_TOKEN);

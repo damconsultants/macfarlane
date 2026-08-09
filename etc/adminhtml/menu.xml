@@ -58,6 +58,12 @@
            action="bynder/index/sync"
            resource="DamConsultants_Macfarlane::menu_item2"
            />
+        <add id="DamConsultants_Macfarlane::menu_item9"
+           title="Check Sku Log" module="DamConsultants_Macfarlane"
+           sortOrder="10" parent="DamConsultants_Macfarlane::menu_item7"
+           action="bynder/index/sku"
+           resource="DamConsultants_Macfarlane::menu_item9"
+           />
        <!-- END:   new node -->
         <!-- START: new node -->
        
