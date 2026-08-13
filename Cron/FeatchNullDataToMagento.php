@@ -3,7 +3,7 @@
 namespace DamConsultants\Macfarlane\Cron;
 
 use Exception;
-use \Psr\Log\LoggerInterface;
+use DamConsultants\Macfarlane\Logger\LoggerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\Product\Action;
@@ -26,7 +26,7 @@ class FeatchNullDataToMagento
     /**
      * @var $logger
      */
-    protected $logger;
+    protected $loggerFactory;
     /**
      * @var $_productRepository
      */
@@ -70,7 +70,7 @@ class FeatchNullDataToMagento
 
     /**
      * Featch Null Data To Magento
-     * @param LoggerInterface $logger
+     * @param LoggerFactory $loggerFactory
      * @param ProductRepository $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManagerInterface
@@ -83,7 +83,7 @@ class FeatchNullDataToMagento
      * @param BynderFactory $bynder
      */
     public function __construct(
-        LoggerInterface $logger,
+        LoggerFactory $loggerFactory,
         ProductRepository $productRepository,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManagerInterface,
@@ -95,7 +95,9 @@ class FeatchNullDataToMagento
         MetaPropertyCollectionFactory $metaPropertyCollectionFactory,
         BynderFactory $bynder
     ) {
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create([
+            'cronName' => 'featch-null-data-to-magento'
+        ]);
         $this->_productRepository = $productRepository;
         $this->collectionFactory = $collectionFactory;
         $this->datahelper = $DataHelper;
@@ -115,16 +117,13 @@ class FeatchNullDataToMagento
      */
     public function execute()
     {
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/FeatchNullDataToMagento.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info("FeatchNullDataToMagento");
+        $this->logger->info("FeatchNullDataToMagento");
 
         $enable = $this->datahelper->getFetchCronEnable();
         if (!$enable) {
             return false;
         }
-        $logger->info("yes");
+        $this->logger->info("yes");
 
         $product_collection = $this->collectionFactory->create();
         $product_sku_limit = (int)$this->datahelper->getProductSkuLimitConfig();
@@ -156,7 +155,7 @@ class FeatchNullDataToMagento
                 $productSku_array[] = $product['sku'];
             }
         }
-
+        $this->logger->info("sku -> " . json_encode($productSku_array));
         foreach ($productSku_array as $sku) {
             $bd_sku = $this->datahelper->replacetoSpecialString($sku);
             $get_data = $this->datahelper->getImageSyncWithProperties($bd_sku, $property_id, $collection_value);

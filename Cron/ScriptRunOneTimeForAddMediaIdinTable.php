@@ -3,7 +3,7 @@
 namespace DamConsultants\Macfarlane\Cron;
 
 use Exception;
-use \Psr\Log\LoggerInterface;
+use DamConsultants\Macfarlane\Logger\LoggerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\Product\Action;
@@ -14,9 +14,9 @@ use DamConsultants\Macfarlane\Model\ResourceModel\Collection\BynderMediaTableCol
 class ScriptRunOneTimeForAddMediaIdinTable
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var $loggerFactory
      */
-    protected $logger;
+    protected $loggerFactory;
     /**
      * @var $bynderMediaTable
      */
@@ -71,7 +71,7 @@ class ScriptRunOneTimeForAddMediaIdinTable
     protected $ApiBynderMediaTableCollection;
     /**
      * Featch Null Data To Magento
-     * @param LoggerInterface $logger
+     * @param LoggerFactory $loggerFactory
      * @param ProductRepository $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManagerInterface
@@ -87,7 +87,7 @@ class ScriptRunOneTimeForAddMediaIdinTable
      * @param \Magento\Framework\App\ResourceConnection $resouce
      */
     public function __construct(
-        LoggerInterface $logger,
+        LoggerFactory $loggerFactory,
         ProductRepository $productRepository,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManagerInterface,
@@ -102,7 +102,9 @@ class ScriptRunOneTimeForAddMediaIdinTable
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\App\ResourceConnection $resouce
     ) {
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create([
+            'cronName' => 'ScriptRunOneTimeForAddMediaIdinTable'
+        ]);
         $this->_productRepository = $productRepository;
         $this->collectionFactory = $collectionFactory;
         $this->datahelper = $DataHelper;
@@ -125,6 +127,7 @@ class ScriptRunOneTimeForAddMediaIdinTable
     public function execute()
     {
         try {
+            $this->logger->info("ScriptRunOneTimeForAddMediaIdinTable Cron");
             $storeId = $this->storeManagerInterface->getStore()->getId();
             $product_collection = $this->collectionFactory->create();
             $product_collection->getSelect()->limit(500);

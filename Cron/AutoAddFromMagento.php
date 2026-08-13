@@ -3,7 +3,7 @@
 namespace DamConsultants\Macfarlane\Cron;
 
 use Exception;
-use \Psr\Log\LoggerInterface;
+use DamConsultants\Macfarlane\Logger\LoggerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\Product\Action;
@@ -24,9 +24,9 @@ class AutoAddFromMagento
     const TYPE_DOCUMENT = 'document1';
 
     /**
-     * @var $logger
+     * @var $loggerFactory
      */
-    protected $logger;
+    protected $loggerFactory;
     /**
      * @var $_productRepository
      */
@@ -74,7 +74,7 @@ class AutoAddFromMagento
 
     /**
      * Featch Null Data To Magento
-     * @param LoggerInterface $logger
+     * @param LoggerFactory $loggerFactory
      * @param ProductRepository $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManagerInterface
@@ -88,7 +88,7 @@ class AutoAddFromMagento
      * @param BynderFactory $bynder
      */
     public function __construct(
-        LoggerInterface $logger,
+        LoggerFactory $loggerFactory,
         ProductRepository $productRepository,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManagerInterface,
@@ -101,7 +101,9 @@ class AutoAddFromMagento
         \DamConsultants\Macfarlane\Model\BynderSycDataFactory $byndersycData,
         BynderFactory $bynder
     ) {
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create([
+            'cronName' => 'auto-add-from-magento'
+        ]);
         $this->_productRepository = $productRepository;
         $this->collectionFactory = $collectionFactory;
         $this->datahelper = $DataHelper;
@@ -122,10 +124,7 @@ class AutoAddFromMagento
      */
     public function execute()
     {
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/AutoAddFromMagento.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info("Auto Add Image Value");
+        $this->logger->info("Auto Add Image Value");
 
         $enable = $this->datahelper->getAutoCronEnable();
         if (!$enable) {
@@ -162,7 +161,7 @@ class AutoAddFromMagento
                 $productSku_array[] = $product['sku'];
             }
         }
-        $logger->info("sku -> " . json_encode($productSku_array));
+        $this->logger->info("sku -> " . json_encode($productSku_array));
 
         if (count($productSku_array) === 0) {
             $this->resetAutoReplaceFlags($logger);
@@ -250,7 +249,7 @@ class AutoAddFromMagento
             $storeId = $this->storeManagerInterface->getStore()->getId();
             $this->action->updateAttributes($ids, ['bynder_auto_replace' => ""], $storeId);
         }
-        $logger->info("bynder_auto_replace null");
+        $this->logger->info("bynder_auto_replace null");
     }
 
     /**

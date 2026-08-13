@@ -3,7 +3,7 @@
 namespace DamConsultants\Macfarlane\Cron;
 
 use Exception;
-use \Psr\Log\LoggerInterface;
+use DamConsultants\Macfarlane\Logger\LoggerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\Product\Action;
@@ -15,9 +15,9 @@ use DamConsultants\Macfarlane\Model\ResourceModel\Collection\ApiBynderMediaTable
 class DeleteValue
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Psr\Log\LoggerFactory
      */
-    protected $logger;
+    protected $loggerFactory;
     /**
      * @var CacheManager
      */
@@ -77,7 +77,7 @@ class DeleteValue
 
     /**
      * Featch Null Data To Magento
-     * @param LoggerInterface $logger
+     * @param LoggerFactory $loggerFactory
      * @param ProductRepository $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory
      * @param StoreManagerInterface $storeManagerInterface
@@ -94,7 +94,7 @@ class DeleteValue
      * @param CacheManager $cacheManager
      */
     public function __construct(
-        LoggerInterface $logger,
+        LoggerFactory $loggerFactory,
         ProductRepository $productRepository,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
         StoreManagerInterface $storeManagerInterface,
@@ -110,7 +110,9 @@ class DeleteValue
         \Magento\Framework\App\ResourceConnection $resouce,
         CacheManager $cacheManager
     ) {
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create([
+            'cronName' => 'delete-value-cron'
+        ]);
         $this->_productRepository = $productRepository;
         $this->collectionFactory = $collectionFactory;
         $this->datahelper = $DataHelper;
@@ -136,6 +138,7 @@ class DeleteValue
         try {
             $enable = $this->datahelper->getDeleteCronEnable();
             if (!$enable) {
+                $this->logger->info("Delete Cron is disabled in configuration.");
                 return false;
             }
             $path = 'cronimageconfig/delete_cron_bynder/delete_cron_last_time';

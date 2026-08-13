@@ -3,21 +3,21 @@
 namespace DamConsultants\Macfarlane\Cron;
 
 use Exception;
-use Psr\Log\LoggerInterface;
+use DamConsultants\Macfarlane\Logger\LoggerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Catalog\Model\Product\Action;
 use DamConsultants\Macfarlane\Model\ResourceModel\Collection\MetaPropertyCollectionFactory;
 use DamConsultants\Macfarlane\Model\ResourceModel\Collection\BynderMediaTableCollectionFactory;
-use DamConsultants\Ahfproducts\Model\ResourceModel\Collection\MagentoSkuCollectionFactory;
-use DamConsultants\Ahfproducts\Model\ResourceModel\MagentoSku;
+use DamConsultants\Macfarlane\Model\ResourceModel\Collection\MagentoSkuCollectionFactory;
+use DamConsultants\Macfarlane\Model\ResourceModel\MagentoSku;
 use Magento\Framework\App\ResourceConnection;
 
 /**
  * Cron: processes the queue of pending SKUs and pushes Bynder media data
  * onto the matching Magento products.
  *
- * Structured after DamConsultants\Ahfproducts\Cron\UpdateAllSku (batch loop
+ * Structured after DamConsultants\Macfarlane\Cron\UpdateAllSku (batch loop
  * over a pending queue, per-row try/catch, log table writes) but:
  *  - drops all alias-sku handling (Macfarlane has no alias concept)
  *  - the actual data-building logic (getDataItem / getProcessItem /
@@ -35,8 +35,8 @@ use Magento\Framework\App\ResourceConnection;
  */
 class UpdateAllSku
 {
-    /** @var LoggerInterface */
-    protected $logger;
+    /** @var LoggerFactory */
+    protected $loggerFactory;
     /** @var ProductRepository */
     protected $_productRepository;
     /** @var StoreManagerInterface */
@@ -58,7 +58,7 @@ class UpdateAllSku
     protected $magentoSku;
 
     public function __construct(
-        LoggerInterface $logger,
+        LoggerFactory $loggerFactory,
         ProductRepository $productRepository,
         StoreManagerInterface $storeManagerInterface,
         \DamConsultants\Macfarlane\Helper\Data $DataHelper,
@@ -71,7 +71,9 @@ class UpdateAllSku
         MetaPropertyCollectionFactory $metaPropertyCollectionFactory,
         ResourceConnection $resourceConnection
     ) {
-        $this->logger = $logger;
+        $this->logger = $loggerFactory->create([
+            'cronName' => 'update-all-sku'
+        ]);
         $this->_productRepository = $productRepository;
         $this->datahelper = $DataHelper;
         $this->action = $action;
@@ -92,14 +94,10 @@ class UpdateAllSku
      */
     public function execute()
     {
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/UpdateAllSku.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info('UpdateAllSku cron started.');
-
+        $this->logger->info('UpdateAllSku cron started.');
         $enable = $this->datahelper->getUpdateAllSkuCronEnable();
         if (!$enable) {
-            $logger->info('UpdateAllSku cron disabled via config, exiting.');
+            $this->logger->info('UpdateAllSku cron disabled via config, exiting.');
             return false;
         }
 
@@ -107,7 +105,7 @@ class UpdateAllSku
         $skuQueueCollection->addFieldToFilter('status', 'pending')->setPageSize(100);
 
         if ($skuQueueCollection->getSize() === 0) {
-            $logger->info('No pending SKUs to process.');
+            $this->logger->info('No pending SKUs to process.');
             return true;
         }
 
@@ -168,12 +166,12 @@ class UpdateAllSku
                 if ($synced) {
                     $this->deleteQueueRow($queueRow);
                 } else {
-                    $logger->info('UpdateAllSku: sync did not complete successfully for SKU ' . $sku . ', leaving queued for retry.');
+                    $this->logger->info('UpdateAllSku: sync did not complete successfully for SKU ' . $sku . ', leaving queued for retry.');
                 }
             } catch (Exception $e) {
-                $logger->info('UpdateAllSku error for SKU ' . $sku . ': ' . $e->getMessage());
+                $this->logger->info('UpdateAllSku error for SKU ' . $sku . ': ' . $e->getMessage());
                 if ($this->isConnectionLostError($e)) {
-                    $logger->info('UpdateAllSku: DB connection lost, reconnecting and skipping SKU ' . $sku . ' for retry next run.');
+                    $this->logger->info('UpdateAllSku: DB connection lost, reconnecting and skipping SKU ' . $sku . ' for retry next run.');
                     $this->ensureDbConnection();
                     continue;
                 }
@@ -187,7 +185,7 @@ class UpdateAllSku
             }
         }
 
-        $logger->info('UpdateAllSku cron completed.');
+        $this->logger->info('UpdateAllSku cron completed.');
         return true;
     }
 
