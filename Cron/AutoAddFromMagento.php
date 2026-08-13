@@ -164,7 +164,7 @@ class AutoAddFromMagento
         $this->logger->info("sku -> " . json_encode($productSku_array));
 
         if (count($productSku_array) === 0) {
-            $this->resetAutoReplaceFlags($logger);
+            $this->resetAutoReplaceFlags();
             return true;
         }
 
@@ -222,12 +222,7 @@ class AutoAddFromMagento
         return true;
     }
 
-    /**
-     * Clears bynder_auto_replace on products that no longer need re-processing.
-     *
-     * @param \Zend_Log $logger
-     */
-    private function resetAutoReplaceFlags($logger)
+    private function resetAutoReplaceFlags()
     {
         $product_collection = $this->collectionFactory->create()
             ->addAttributeToSelect('*')
